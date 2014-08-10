@@ -1,14 +1,11 @@
-
-
-
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 
-#define output_low(port,pin) port &= ~(1<<pin)
-#define output_high(port,pin) port |= (1<<pin)
-#define output_toggle(port,pin) port ^= (1<<pin)
-#define set_input(portdir,pin) portdir &= ~(1<<pin)
-#define set_output(portdir,pin) portdir |= (1<<pin)
+#define outLow(port,pin) port &= ~(1<<pin)
+#define outHigh(port,pin) port |= (1<<pin)
+#define outToggle(port,pin) port ^= (1<<pin)
+#define setIn(portdir,pin) portdir &= ~(1<<pin)
+#define setOut(portdir,pin) portdir |= (1<<pin)
 
 const uint8_t freq[] PROGMEM =  {
 		113, 113, 113, 147, 113, 97, 197, 147, 197, 234, 170, 156,
@@ -25,7 +22,7 @@ const uint8_t freq[] PROGMEM =  {
 		174, 197, 150, 150, 150, 150, 129, 113, 86, 98, 150, 150,
 		150, 150, 129, 113, 150, 174, 197, 113, 113, 113, 147,
 		113, 97, 197
-	};
+};
 
 const uint8_t length[] PROGMEM = {
 		100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 80, 100,
@@ -60,8 +57,10 @@ const int delay[] PROGMEM = {
 
 void sleep(int ms) {
 	int cnt;
+
 	for (cnt=0; cnt<(ms); cnt++) {
 		int i = 150;
+
 		while(i--) {
 			__asm("NOP");
 		}
@@ -71,33 +70,21 @@ void sleep(int ms) {
 int main(void) {
 	uint8_t cnt;
 
-	set_output(DDRB,PB0); //speaker
-/*	set_output(DDRB,PB3); //led 1
-	output_low(PORTB,PB3);
-	set_output(DDRB,PB4); //led 2
-	output_high(PORTB,PB4);
-	set_output(DDRB,PB2); //led1 gnd
-	output_low(PORTB,PB2);
-	set_output(DDRB,PB1); //led2 gnd
-	output_low(PORTB,PB1);*/
-
+	setOut(DDRD,PD6); //speaker
 
 	TCCR0A |= (1<<WGM01);  // configure timer 1 for CTC mode
 	TCCR0A |= (1<<COM0A0); // toggle OC0A on compare match
 	TCCR0B |= (1<<CS01);   // clk/8 prescale
 
-
 	for (;;) {
 		for (cnt=0; cnt<156; cnt++) {
-			OCR0A=pgm_read_byte(&freq[cnt]);
-/*			output_toggle(PORTB,PB3);
-			output_toggle(PORTB,PB4);*/
-			sleep( pgm_read_byte(&length[cnt]) );
-/*			output_toggle(PORTB,PB3);
-			output_toggle(PORTB,PB4);*/
+			OCR0A = pgm_read_byte(&freq[cnt]);
+			sleep(pgm_read_byte(&length[cnt]));
+
 			// stop timer
 			TCCR0B = 0;
-			sleep ( pgm_read_word(&delay[cnt]) );
+			sleep (pgm_read_word(&delay[cnt]));
+
 			// start timer
 			TCCR0B |= (1<<CS01);   // clk/8 prescale
 		}
@@ -105,7 +92,3 @@ int main(void) {
 
 	return 0;
 }
-
-
-
-
