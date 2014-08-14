@@ -7,13 +7,13 @@ TARGET = atmega328
 CLOCK = 16000000
 
 # Recommended build options
-CFLAGS = -Wall -Wno-overflow -pedantic -std=c99 -Ofast -mmcu=$(TARGET) -DF_CPU=$(CLOCK)
+CFLAGS = -Wall -Wno-overflow -pedantic -std=c99 -Ofast -mmcu=$(TARGET) -DF_CPU=$(CLOCK) -I.
 OBJFLAGS = -j .text -j .data -O ihex
 DUDEFLAGS = -p $(TARGET) -c avrisp -b 19200 -P /dev/ttyACM0
 #DUDEFLAGS = -p $(TARGET) -c usbtiny -B 1
 
 # Object files for the firmware
-OBJECTS = main.o
+OBJECTS = main.o wav.o
 
 # By default, build the firmware, but do not flash it
 all: main.hex
