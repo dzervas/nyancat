@@ -12,9 +12,9 @@ volatile uint16_t sample;
  *		(ex. to achieve 8kHz with /8 prescalar in 16MHz, this is 249)
  */
 void wplay(int *out, int *clock, int count) {
-	for (sample = 0; sample < pcm_length; sample++) {
+	for (sample = 0; sample < pcm_length;) {
 		if (*clock >= count) {
-			*out = pgm_read_byte(&pcm_data[sample]);
+			*out = pgm_read_byte(&pcm_data[sample++]);
 			*clock = 0;
 		}
 	}
