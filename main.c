@@ -36,56 +36,57 @@ void wplay(volatile uint8_t *out, volatile uint8_t *clock, int count) {
 
 void dinit() {
 	DDDR = 0;
-	DDDR |= (1 << DSCK) | (1 << DSDIN) | (1 << DDC) | (1 << DSCE) | (1 << DRES);
+	DDDR |= _BV(DSCK) | _BV(DSDIN) | _BV(DDC) | _BV(DSCE) | _BV(DRES);
 
 	DPORT = 0;
-	DPORT |= (1 << DSCE) | (1 << DRES);
-	DPORT &= ~(1 << DSCK) & ~(1 << DSDIN) & ~(1 << DDC);
+	DPORT |= _BV(DSCE) | _BV(DRES);
+	DPORT &= ~_BV(DSCK) & ~_BV(DSDIN) & ~_BV(DDC);
 
-	DPORT &= ~(1 << DRES);
-	DPORT |= (1 << DRES);
+	DPORT &= ~_BV(DRES);
+	_delay_ms(20);
+	DPORT |= _BV(DRES);
 	_delay_ms(200);
 
 	/* Initiate screen (see datasheet p.14) */
-	dsend((1 << 5) | 1);		/* Set function set with PD=0, V=0, H=1 */
-	dsend((1 << 2) | 0);		/* Set temperature coefficient to 0 (0-3) */
-	dsend((1 << 4) | 3);		/* Set bias mode 1:48 (0-7) */
-	dsend((1 << 7) | 52);		/* Set contrast to 52 (0-127) */
-	dsend((1 << 5));		/* Set function set with PD=0, V=0, H=0 */
-	dsend((1 << 3) | (1 << 2));	/* Set screen to normal mode */
+	dsend(_BV(5) | 1);		/* Set function set with PD=0, V=0, H=1 */
+	dsend(_BV(2) | 0);		/* Set temperature coefficient to 0 (0-3) */
+	dsend(_BV(4) | 3);		/* Set bias mode 1:48 (0-7) */
+	dsend(_BV(7) | 52);		/* Set contrast to 52 (0-127) */
+	dsend(_BV(5));		/* Set function set with PD=0, V=0, H=0 */
+	dsend(_BV(3) | _BV(2));	/* Set screen to normal mode */
 	_delay_ms(200);
 
-	DPORT |= (1 << DDC);
+	DPORT |= _BV(DDC);
 	dsend(255);
 }
 
 void dsend(uint8_t data) {
-	DPORT &= ~(1 << DSCE);
+	DPORT &= ~_BV(DSCE);
 
 	for (uint8_t i = 0; i < 8; i++) {
-		DPORT |= (((data & (1 << i)) >> i) << DSDIN);
+		DPORT |= (((data & _BV(i)) >> i) << DSDIN);
 		_delay_ms(25);
 
-		DPORT &= ~(1 << DSCK);
+		DPORT &= ~_BV(DSCK);
 		_delay_ms(25);
-		DPORT |= (1 << DSCK);
+		DPORT |= _BV(DSCK);
 		_delay_ms(25);
 
-		DPORT &= ~(1 << DSDIN);
+		DPORT &= ~_BV(DSDIN);
 	}
 
-	DPORT |= (1 << DSCE);
+	DPORT |= _BV(DSCE);
 }
 
 int main(void) {
-	DDRD |= (1 << 3); /* Speaker */
+	DDRD |= _BV(3); /* Speaker */
 
 	/* Set clk/8 prescalar for the counter0 */
-	TCCR0B |= (1 << CS01);
+	TCCR0B |= _BV(CS01);
 
 	/* Set fast PWM without prescalar for the counter2 */
-	TCCR2A = (1 << COM2A1) | (1 << COM2B1) | (1 << WGM21) | (1 << WGM20);
-	TCCR2B = (1 << CS20);
+	TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
+	TCCR2B = _BV(CS20);
 
 	dinit();
 
