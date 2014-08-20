@@ -41,11 +41,12 @@ void dinit() {
 	DPORT = 0;
 	DPORT |= _BV(DSCE) | _BV(DRES);
 	DPORT &= ~_BV(DSCK) & ~_BV(DSDIN) & ~_BV(DDC);
+	_delay_ms(2);
 
 	DPORT &= ~_BV(DRES);
-	_delay_ms(20);
+	_delay_ms(2);
 	DPORT |= _BV(DRES);
-	_delay_ms(200);
+	_delay_ms(2);
 
 	/* Initiate screen (see datasheet p.14) */
 	dsend(_BV(5) | 1);		/* Set function set with PD=0, V=0, H=1 */
@@ -62,15 +63,16 @@ void dinit() {
 
 void dsend(uint8_t data) {
 	DPORT &= ~_BV(DSCE);
+	_delay_ms(2);
 
-	for (uint8_t i = 0; i < 8; i++) {
+	for (uint8_t i = 7; i >= 0; i++) {
 		DPORT |= (((data & _BV(i)) >> i) << DSDIN);
-		_delay_ms(25);
+		_delay_ms(2);
 
 		DPORT &= ~_BV(DSCK);
-		_delay_ms(25);
+		_delay_ms(2);
 		DPORT |= _BV(DSCK);
-		_delay_ms(25);
+		_delay_ms(2);
 
 		DPORT &= ~_BV(DSDIN);
 	}
