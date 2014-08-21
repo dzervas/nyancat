@@ -3,8 +3,10 @@ CC = avr-gcc
 OBJCOPY = avr-objcopy
 DUDE = avrdude
 SIZE = avr-size
-TARGET = atmega328
-CLOCK = 16000000
+TARGET = attiny85
+CLOCK = 8000000
+#TARGET = atmega328
+#CLOCK = 16000000
 
 # Recommended build options
 CFLAGS = -Wall -Wno-overflow -pedantic -std=c99 -Ofast -mmcu=$(TARGET) -DF_CPU=$(CLOCK)

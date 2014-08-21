@@ -24,20 +24,21 @@ void wplay(volatile uint8_t *out, volatile uint8_t *clock, int count) {
 }
 
 int main(void) {
-	DDRD |= _BV(3); /* Speaker */
+	DDRB |= _BV(0); /* Speaker */
 
 	/* Set clk/8 prescalar for the counter0 */
-	TCCR0B |= _BV(CS01);
+	TCCR1 |= _BV(CS12);
 
 	/* Set fast PWM without prescalar for the counter2 */
-	TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
-	TCCR2B = _BV(CS20);
+	//TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM01) | _BV(WGM00);
+	TCCR0A = _BV(COM0A1) | _BV(WGM01) | _BV(WGM00);
+	TCCR0B = _BV(CS00);
 
 	while (1)
 		/* To find clock tick: <CPU frequency>/8 (due to the prescalara) and devide
 		   by <Sample rate> (which is 8000). Remove one due to the counter
 		   nature (zero based) */
-		wplay(&OCR2B, &TCNT0, (F_CPU/8/8000) - 1);
+		wplay(&OCR0A, &TCNT1, (F_CPU/8/8000) - 1);
 
 	return 0;
 }
